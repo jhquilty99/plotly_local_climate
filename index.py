@@ -12,6 +12,7 @@ from datetime import date
 
 # Overall layout
 app.layout = html.Div([
+    dcc.Store(id = 'tabs-value'),
     html.Br(),
     # Header
     html.H1('Climate Visualizer'),
@@ -41,9 +42,9 @@ sidebar = html.Div(
         ),
         dbc.Nav(
             [
-                dbc.Input(id = 'lat', type = 'number', placeholder='GPS Latitude Goes Here'),
+                dcc.Input(id = 'lat', type = 'number', min = -90, max = 90, placeholder='GPS Latitude Goes Here', debounce = True, value = 38.80),
                 html.Br(),
-                dbc.Input(id = 'long', type = 'number', placeholder='GPS Longitude Goes Here'),
+                dcc.Input(id = 'long', type = 'number', min = -180, max = 180, placeholder='GPS Longitude Goes Here', debounce = True, value = -77.05),
                 html.Br(),
                 dcc.DatePickerRange(
                     id='date-picker-range',
@@ -65,31 +66,34 @@ tab_1 = html.Div([
             html.Br(),
             html.H3('Changes in Climate Metrics by Year'),
             html.Hr(),
+            html.P('Visualizes climate metrics by year: temperature, snow day percent, frost day percent.', className="lead"),
             dbc.Row([dbc.Col(sidebar), 
-                    dbc.Col(
-                        dcc.Graph(id = 'graph_temp'
-                            ), width = 9
-                        )
-                    ])
+                    dbc.Col([
+                        html.P('Mean temperature by year with trendline', className="lead"),
+                        dcc.Graph(id = 'graph_1'),
+                        html.P('Mean snow and frost days percent by year with trendline', className="lead"),
+                        dcc.Graph(id = 'graph_2'),
+                        html.P('Mean temperature heatmap by year and month', className="lead"),
+                        dcc.Graph(id = 'graph_3'),
+                    ], width = 9)
+                ])
         ])
 
 tab_2 = html.Div([
             html.Br(),
             html.H3('Changes in Climate Metrics by Season'),
             html.Hr(),
+            html.P('Visualizes climate metrics by month: temperature, snowfall chance, frost day percent.', className="lead"),
             dbc.Row([dbc.Col(sidebar), 
-                    dbc.Col(
-                        dcc.Graph(
-                            figure=dict(
-                                data=[dict(
-                                    x=[1, 2, 3],
-                                    y=[3, 1, 2],
-                                    type='bar'
-                                )]
-                            )
-                        ), width = 9
-                    )
-            ])
+                    dbc.Col([
+                        html.P('Mean temperature and snowfall chance by month', className="lead"),
+                        dcc.Graph(id = 'graph_1'),
+                        html.P('Mean snow and frost day chance by month with frost date line', className="lead"),
+                        dcc.Graph(id = 'graph_2'),
+                        html.P('Mean temperature heatmap by day and month', className="lead"),
+                        dcc.Graph(id = 'graph_3'),
+                    ], width = 9)
+                ])
         ])
 
 # Seasonal Climate Changes Tab 
