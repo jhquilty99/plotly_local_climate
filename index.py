@@ -5,7 +5,6 @@ import pandas as pd
 from dash.dependencies import Input, Output
 from datetime import datetime
 from datetime import timedelta
-import callbacks
 import os
 from app import app
 from datetime import date

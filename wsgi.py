@@ -1,4 +1,4 @@
 import index
-from app import app
+import callbacks
 
-server = app.server
+server = index.app.server
