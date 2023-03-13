@@ -1,5 +1,4 @@
-from index import app
-import index
+from index import app, tab_1, tab_2
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 import graph
@@ -14,9 +13,9 @@ from datetime import date
 )
 def render_content(tab):
     if tab == 'tab-1':
-        return (index.tab_1, 1)
+        return (tab_1, 1)
     elif tab == 'tab-2':
-        return (index.tab_2, 2)
+        return (tab_2, 2)
     
 
 @app.callback(
