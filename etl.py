@@ -5,9 +5,9 @@ import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-def load_annual_data(lat, long, start, end):
+def load_annual_data(lat = 38.80, long = -77.05, start = '1971-01-01', end = '2023-03-05'):
     # Extract data
-    url = f'https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={long}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
+    url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
     response = requests.get(url)
     # Load data
     response = json.loads(response.text)
@@ -26,9 +26,20 @@ def load_annual_data(lat, long, start, end):
     # Clean up data
     df.dropna(inplace = True)
     df = df.loc[df['year'] != '2023']
+    monthly_agg_df = pd.DataFrame()
+    # Derive new features for the monthly data
+    monthly_agg_df['snowfall_chance'] = df.groupby(by = 'month').apply(lambda x: x['snowfall_sum'].mean())
+    monthly_agg_df['sunlight_minutes'] = df.groupby(by = 'month').apply(lambda x: x['sunlight_minutes'].mean())
+    monthly_agg_df['frost_day'] = df.groupby(by = 'month').apply(lambda x: x['frost_day'].mean())
     yearly_agg_df = pd.DataFrame()
-    precipitation_df = df.groupby('month').apply(lambda x: x['snowfall_chance'].mean())
-    days_with_frost = df.groupby(by = 'year').apply(lambda x: x['frost_day'].sum())
+    # Derive new features for the yearly data
+    yearly_agg_df['snowfall_chance'] = df.groupby(by = 'year').apply(lambda x: x['snowfall_chance'].mean())
+    yearly_agg_df['frost_day'] = df.groupby(by = 'year').apply(lambda x: x['frost_day'].sum())
+    yearly_agg_df['avg_mean_temp'] = df.groupby('year').apply(lambda x: x['temperature_2m_mean'].mean())
+    yearly_agg_df['avg_min_temp'] = df.groupby('year').apply(lambda x: x['temperature_2m_min'].mean())
+    yearly_agg_df['avg_max_temp'] = df.groupby('year').apply(lambda x: x['temperature_2m_max'].mean())
+    # Linear regression to fit the climate change trendline
     lin_regr = LinearRegression()
     lin_res = lin_regr.fit(np.array(df['year']).reshape(-1,1), np.array(df['temperature_2m_mean']))
-    lin_fit = lin_regr.predict(np.array(df['year']).reshape(-1,1))
+    lin_array = lin_regr.predict(np.array(df['year']).reshape(-1,1))
+    return(df, monthly_agg_df, yearly_agg_df, lin_array, lin_res.coef_)

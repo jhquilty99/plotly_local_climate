@@ -8,6 +8,7 @@ from datetime import timedelta
 import callbacks
 import os
 from app import app
+from datetime import date
 
 # Overall layout
 app.layout = html.Div([
@@ -15,11 +16,11 @@ app.layout = html.Div([
     # Header
     html.H1('Climate Visualizer'),
     # Tabs for each section
-    dcc.Tabs(id='tabs-1', value='tab-1', children=[
+    dcc.Tabs(id='tabs', value='tab-1', children=[
         dcc.Tab(label='Annual Climate Changes', value='tab-1'),
         dcc.Tab(label='Seasonal Climate Changes', value='tab-2'),
     ]),
-    html.Div(id='tabs-content-1')
+    html.Div(id='tabs-content')
 ])
 
 # Sidebar for tabs
@@ -40,12 +41,17 @@ sidebar = html.Div(
         ),
         dbc.Nav(
             [
-                dcc.Dropdown(id = 'one'),
+                dbc.Input(id = 'lat', type = 'number', placeholder='GPS Latitude Goes Here'),
                 html.Br(),
-                dcc.Dropdown(id = 'two'),
+                dbc.Input(id = 'long', type = 'number', placeholder='GPS Longitude Goes Here'),
                 html.Br(),
-                dcc.Dropdown(id = 'three')
-
+                dcc.DatePickerRange(
+                    id='date-picker-range',
+                    min_date_allowed = date(1960, 1, 1),
+                    max_date_allowed = date.today(),
+                    start_date = date(1970, 3, 1),
+                    end_date = date(2023, 3, 1)
+                ),
             ],
             vertical=True,
             pills=True,
@@ -61,17 +67,10 @@ tab_1 = html.Div([
             html.Hr(),
             dbc.Row([dbc.Col(sidebar), 
                     dbc.Col(
-                        dcc.Graph(
-                            figure=dict(
-                                data=[dict(
-                                    x=[1, 2, 3],
-                                    y=[3, 1, 2],
-                                    type='bar'
-                                )]
-                            )
-                        ), width = 9
-                    )
-            ])
+                        dcc.Graph(id = 'graph_temp'
+                            ), width = 9
+                        )
+                    ])
         ])
 
 tab_2 = html.Div([
