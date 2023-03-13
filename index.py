@@ -6,8 +6,8 @@ from dash.dependencies import Input, Output
 from datetime import datetime
 from datetime import timedelta
 import os
-from app import app
 from datetime import date
+from app import app
 
 # Overall layout
 app.layout = html.Div([

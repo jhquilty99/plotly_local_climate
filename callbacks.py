@@ -1,4 +1,4 @@
-from index import app, tab_1, tab_2
+import index
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 import graph
@@ -6,19 +6,19 @@ import etl
 from datetime import date
 
 
-@app.callback(
+@index.app.callback(
     Output('tabs-content', 'children'),
     Output('tabs-value','data'),
     Input('tabs', 'value')
 )
 def render_content(tab):
     if tab == 'tab-1':
-        return (tab_1, 1)
+        return (index.tab_1, 1)
     elif tab == 'tab-2':
-        return (tab_2, 2)
+        return (index.tab_2, 2)
     
 
-@app.callback(
+@index.app.callback(
     Output('graph_1', 'figure'),
     Output('graph_2', 'figure'),
     Output('graph_3', 'figure'),
