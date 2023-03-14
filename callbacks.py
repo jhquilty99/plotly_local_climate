@@ -38,4 +38,7 @@ def update_temp_graph(lat, long, start_date, end_date, tabs):
     else:
         return(graph.temp_snow(data[0],data[1]), graph.frost_line(data[0]), graph.heatmap_temp(data[0], by = ['day','month']))
     
+if __name__ == '__main__':
+    index.app.run_server(debug=True, host='127.0.0.1')
+    
     

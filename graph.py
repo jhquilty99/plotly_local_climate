@@ -33,17 +33,26 @@ def heatmap_temp(df, by = ['year','month']):
         go.Heatmap(x = heatmap[by[0]], y = heatmap[by[1]], z = heatmap['values'], name = 'Historical radiation')
     )
     fig.update_xaxes(categoryorder='category ascending')
+    fig.update_layout(template="simple_white")
     return(fig)
 
 # For graph: 'Mean snow and frost days percent by year with trendline' 
 def snow_trend(agg_df):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['frost_day'], name = '% Days of frost'),
+        go.Scatter(x = agg_df.index, y = etl.lin_reg_fit(agg_df, 'frost_day')[0], name = 'Frost Days Trendline', line = dict(color = 'Orange')),
         secondary_y=False
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['snow_day'], name = '% Days of snow'),
+        go.Scatter(x = agg_df.index, y = agg_df['frost_day'], name = '% Days of frost', mode = 'markers'),
+        secondary_y=False
+    )
+    fig.add_trace(
+        go.Scatter(x = agg_df.index, y = etl.lin_reg_fit(agg_df, 'snow_day')[0], name = 'Snow Days Trendline', line = dict(color = 'Blue')),
+        secondary_y=True
+    )
+    fig.add_trace(
+        go.Scatter(x = agg_df.index, y = agg_df['snow_day'], name = '% Days of snow', mode = 'markers'),
         secondary_y=True
     )
     fig.update_layout(template="simple_white")
@@ -51,7 +60,14 @@ def snow_trend(agg_df):
 
 # For graph: 'Mean temperature by year with trendline'
 def temp_trend(agg_df):
-    fig = px.scatter(agg_df, y = 'avg_min_temp', trendline="ols", trendline_color_override="red")
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(x = agg_df.index, y = etl.lin_reg_fit(agg_df, 'avg_mean_temp')[0], name = 'Trendline', line = dict(color = 'Orange'))
+    )
+    fig.add_trace(
+        go.Scatter(x = agg_df.index, y = agg_df['avg_mean_temp'], name = 'Average Historical Temperature', mode = 'markers')
+    )
+    fig.update_layout(template="simple_white")
     return(fig)
 
 # For graph: 'Mean snow and frost day chance by month with frost date line'
@@ -65,6 +81,7 @@ def frost_line(df):
         go.Violin(x = df['month'], y = df['snowfall_sum'], name = 'Snow Fall'),
         secondary_y=True
     )
+    fig.update_layout(template="simple_white")
     return(fig)
 
 
