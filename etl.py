@@ -36,7 +36,7 @@ def load_annual_data(lat = 38.80, long = -77.05, start = '1971-01-01', end = '20
     yearly_agg_df = pd.DataFrame()
     # Derive new features for the yearly data
     yearly_agg_df['snow_day'] = df.groupby(by = 'year').apply(lambda x: x['snow_day'].mean())
-    yearly_agg_df['frost_day'] = df.groupby(by = 'year').apply(lambda x: x['frost_day'].sum())
+    yearly_agg_df['frost_day'] = df.groupby(by = 'year').apply(lambda x: x['frost_day'].mean())
     yearly_agg_df['avg_mean_temp'] = df.groupby('year').apply(lambda x: x['temperature_2m_mean'].mean())
     yearly_agg_df['avg_min_temp'] = df.groupby('year').apply(lambda x: x['temperature_2m_min'].mean())
     yearly_agg_df['avg_max_temp'] = df.groupby('year').apply(lambda x: x['temperature_2m_max'].mean())
