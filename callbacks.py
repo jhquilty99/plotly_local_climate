@@ -39,12 +39,12 @@ def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
     if tabs == 1:
         temp_trend = graph.temp_trend(annual_data)
         snow_trend = graph.snow_trend(annual_data)
-        return(html.H4(f'For {str(lat)}, {str(long)} yearly mean temperatures have risen {str(round(temp_trend[1],3))} degrees Fahrenheit per year. Percent of the year that were snow days has decreased {str(round(-100*snow_trend[2],3))}% per year. Percent of the year that were below freezing on average went down {str(round(-100*snow_trend[1],3))}% per year.'), 
+        return(html.H4(f'For GPS Coordinates ({str(lat)}, {str(long)}), yearly mean temperatures have risen {str(round(temp_trend[1],3))} degrees Fahrenheit per year. Percent of the year which could be counted as snow days (snow fall > 0) decreased {str(round(-100*snow_trend[2],3))}% per year. Percent of the year that has below freezing average tremperatures went down {str(round(-100*snow_trend[1],3))}% per year.'), 
                graph.heatmap_temp(data), 
                temp_trend[0], 
                snow_trend[0])
     else:
-        return(html.H4(f'Seasonal metrics for {str(lat)}, {str(long)}'),
+        return(html.H4(f'Seasonal metrics for GPS Coordinates ({str(lat)}, {str(long)}).'),
                graph.heatmap_temp(data, by = ['day','month']), 
                graph.temp_snow(data, seasonal_data), 
                graph.radiation_graph(data))

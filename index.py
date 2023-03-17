@@ -1,14 +1,9 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 #from dash_bootstrap_templates import load_figure_template
-import os
 from datetime import date
 from app import app
-from dash_bootstrap_templates import load_figure_template
 import dash_leaflet as dl
-
-
-load_figure_template('DARKLY')
 
 # Sidebar for tabs
 SIDEBAR_STYLE = {
@@ -78,7 +73,7 @@ tab_2 = html.Div([
             html.Br(),
             html.H3('Changes in Climate Metrics by Season'),
             html.Hr(),
-            html.P('Visualizes climate metrics by month: temperature, snowfall chance, frost day percent.', className="lead"),
+            html.P('Visualizes climate metrics by month: temperature, snowfall chance, and solar radiation.', className="lead"),
             dcc.Loading(html.Div(id = 'statement', style = {"backgroundColor": "#000000","padding": "1rem 1rem"}), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_1'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_2'), type = 'circle'),
