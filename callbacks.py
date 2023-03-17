@@ -28,16 +28,26 @@ def render_content(tab):
     Input('data','data'),
     Input('seasonal-data','data'),
     Input('annual-data','data'),
+    State('lat','data'),
+    State('long','data'),
     prevent_initial_call=True
 ) 
-def update_graphs(tabs, data, seasonal_data, annual_data):
+def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
     data = pd.read_json(data)
     seasonal_data = pd.read_json(seasonal_data)
     annual_data = pd.read_json(annual_data)
     if tabs == 1:
-        return(html.H4('Hello'), graph.temp_trend(annual_data), graph.snow_trend(annual_data), graph.heatmap_temp(data))
+        temp_trend = graph.temp_trend(annual_data)
+        snow_trend = graph.snow_trend(annual_data)
+        return(html.H4(f'For {str(lat)}, {str(long)} yearly mean temperatures have risen {str(round(temp_trend[1],3))} degrees Fahrenheit per year. Percent of the year that were snow days has decreased {str(round(-100*snow_trend[2],3))}% per year. Percent of the year that were below freezing on average went down {str(round(-100*snow_trend[1],3))}% per year.'), 
+               graph.heatmap_temp(data), 
+               temp_trend[0], 
+               snow_trend[0])
     else:
-        return(html.H4('Hi'), graph.temp_snow(data, seasonal_data), graph.frost_line(data), graph.heatmap_temp(data, by = ['day','month']))
+        return(html.H4(f'Seasonal metrics for {str(lat)}, {str(long)}'),
+               graph.heatmap_temp(data, by = ['day','month']), 
+               graph.temp_snow(data, seasonal_data), 
+               graph.radiation_graph(data))
 
 
 @index.app.callback(
@@ -84,16 +94,16 @@ if __name__ == '__main__':
 # To-do list
 # - Make theme dark (X)
 # - Change plot themes (X)
-# - Make annual temp plots show min and max temps with lines in between
-# - Include radiation graph in seasonal
-# - Include precipitation graph with percent snow in seasonal and annual
+# - Make annual temp plots show min and max temps with lines in between (x)
+# - Include radiation graph in seasonal (x)
+# - Include precipitation graph in seasonal and annual
 # - Make apply changes button (x)
 # - Make tabs a clearer clickable entity (x)
-# - Make a spinny refresh icon
-# - Make url haydenquilty.com/climate/
+# - Make a spinny refresh icon (x)
+# - Make url climate.haydenquilty.com (x)
 # - Make blog point to haydenquilty.com
-# - Store dataframe as JSON for faster loading
-# - Include a GPS pin map
-# - Include a summary sentence at the top of the tab
+# - Store dataframe as JSON for faster loading (x)
+# - Include a GPS pin map (x)
+# - Include a summary sentence at the top of the tab (x)
     
     

@@ -22,3 +22,6 @@
 .row {
     --bs-gutter-x: 0;
 }
+*{
+    font-family: Arial;
+  }

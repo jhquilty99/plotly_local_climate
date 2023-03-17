@@ -20,7 +20,7 @@ SIDEBAR_STYLE = {
     "backgroundColor": "#000000",
 }
 INLINE_STYLE = {'display': 'inline-block', 'width':'49%'}
-LOADING_STYLE = {'position': 'absolute', 'align-self': 'center'}
+SELECT_STYLE = {"backgroundColor": '#3498db','color':'#FFFFFF', 'box-shadow': '0px 7px 15px #000'}
 sidebar = html.Div([
         html.H2("Filters"),
         html.Hr(),
@@ -37,7 +37,10 @@ sidebar = html.Div([
                                                         clearable=True,
                                                         style = INLINE_STYLE 
                                                     )]), 
-                dbc.Row([dbc.Button('Apply Changes', color = 'info', id = 'apply-changes')])
+                dbc.Row([dbc.Button('Apply Changes', color = 'info', id = 'apply-changes')]),
+                dcc.Loading(dcc.Store(id = 'data')),
+                dcc.Store(id = 'annual-data'),
+                dcc.Store(id = 'seasonal-data'),
         ], gap = 3)
     ], style=SIDEBAR_STYLE)
 
@@ -46,20 +49,17 @@ app.layout = html.Div([
     dcc.Store(id = 'tabs-value'),
     dcc.Store(id = 'lat'),
     dcc.Store(id = 'long'),
-    dcc.Store(id = 'data'),
-    dcc.Store(id = 'annual-data'),
-    dcc.Store(id = 'seasonal-data'),
     html.Br(),
     # Header
     html.H1('Climate Visualizer'),
     sidebar,
     # Tabs for each section
     dcc.Tabs(id='tabs', value='tab-1', children=[
-        dcc.Tab(label='Annual Climate Changes', value='tab-1', selected_style={"backgroundColor": '#3498db','color':'#FFFFFF'}),
-        dcc.Tab(label='Seasonal Climate Changes', value='tab-2', selected_style={"backgroundColor": '#3498db','color':'#FFFFFF'}),
+        dcc.Tab(label='Annual Climate Changes', value='tab-1', selected_style=SELECT_STYLE),
+        dcc.Tab(label='Seasonal Climate Changes', value='tab-2', selected_style=SELECT_STYLE),
     ], colors = { 'border': "#000000", 'primary': '#3498db', 'background': "#222"}),
-    html.Div(id='tabs-content'),
-], style = {"padding": "1rem"})
+    dcc.Loading(html.Div(id='tabs-content'), type = 'circle'),
+], style = {"padding": "1rem", "backgroundColor": '#343434'})
 
 # Annual Climate Changes Tab
 tab_1 = html.Div([
@@ -67,7 +67,7 @@ tab_1 = html.Div([
             html.H3('Changes in Climate Metrics by Year'),
             html.Hr(),
             html.P('Visualizes climate metrics by year: temperature, snow day percent, frost day percent.', className="lead"),
-            dcc.Loading(html.Div(id = 'statement'), type = 'circle'),
+            dcc.Loading(html.Div(id = 'statement', style = {"backgroundColor": "#000000","padding": "1rem 1rem"}), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_1'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_2'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_3'), type = 'circle')
@@ -79,7 +79,7 @@ tab_2 = html.Div([
             html.H3('Changes in Climate Metrics by Season'),
             html.Hr(),
             html.P('Visualizes climate metrics by month: temperature, snowfall chance, frost day percent.', className="lead"),
-            dcc.Loading(html.Div(id = 'statement'), type = 'circle'),
+            dcc.Loading(html.Div(id = 'statement', style = {"backgroundColor": "#000000","padding": "1rem 1rem"}), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_1'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_2'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_3'), type = 'circle')

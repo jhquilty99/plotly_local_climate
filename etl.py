@@ -31,7 +31,6 @@ def load_annual_data(lat = 38.80, long = -77.05, start = '1971-01-01', end = '20
     monthly_agg_df = pd.DataFrame()
     # Derive new features for the monthly data
     monthly_agg_df['snow_day'] = df.groupby(by = 'month').apply(lambda x: x['snow_day'].mean())
-    monthly_agg_df['sunlight_minutes'] = df.groupby(by = 'month').apply(lambda x: x['sunlight_minutes'].mean())
     monthly_agg_df['frost_day'] = df.groupby(by = 'month').apply(lambda x: x['frost_day'].mean())
     yearly_agg_df = pd.DataFrame()
     # Derive new features for the yearly data
@@ -52,4 +51,4 @@ def lin_reg_fit(df, y, x = None):
     else:
         lin_res = lin_regr.fit(np.array(df.index).reshape(-1,1), np.array(df[y]))
         lin_array = lin_regr.predict(np.array(df.index).reshape(-1,1))
-    return(lin_array, lin_res.coef_)
+    return(lin_array, lin_res.coef_[0])

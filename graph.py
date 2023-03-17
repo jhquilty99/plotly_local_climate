@@ -8,11 +8,11 @@ from plotly.subplots import make_subplots
 def temp_snow(df, monthly_agg_df):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Violin(x = df['month'], y = df['temperature_2m_mean'], name = 'Historical mean temperatures'),
+        go.Violin(x = df['month'], y = df['temperature_2m_mean'], name = 'Historical mean temperatures', fillcolor = 'Salmon', line = dict(color = 'Red')),
         secondary_y=False
     )
     fig.add_trace(
-        go.Scatter(x = monthly_agg_df.index, y = monthly_agg_df['snow_day'], name = 'Chance of snow fall'),
+        go.Scatter(x = monthly_agg_df.index, y = monthly_agg_df['snow_day'], name = 'Chance of snow fall', line = dict(color = 'aqua')),
         secondary_y=True
     )
     fig.add_hrect(y0=-10, y1=32, 
@@ -20,9 +20,9 @@ def temp_snow(df, monthly_agg_df):
                 annotation_font_size=11,
                 annotation_font_color="White",
                 fillcolor="blue", opacity=0.25, line_width=0)
-    fig.update_xaxes(categoryorder='category ascending', title = 'Month')
-    fig.update_yaxes(title = 'Temperature in Fahrenheit', secondary_y=False)
-    fig.update_yaxes(title = 'Snow Day Chance', secondary_y=True)
+    fig.update_xaxes(categoryorder='category ascending', title = 'Month', showgrid=False)
+    fig.update_yaxes(title = 'Temperature in Fahrenheit', secondary_y=False, showgrid=False, range = [0, 100])
+    fig.update_yaxes(title = 'Snow Day Chance', secondary_y=True, showgrid=False, range = [0, 1])
     fig.update_layout(title = 'Mean Temperature and Snowfall Chance by Month', legend_title = 'Metrics', legend_orientation = 'h', plot_bgcolor = '#000', paper_bgcolor = '#000')
     return(fig)
 
@@ -32,61 +32,63 @@ def heatmap_temp(df, by = ['year','month']):
     heatmap = df.groupby(by = by).apply(lambda x: x['temperature_2m_mean'].mean())
     heatmap = heatmap.reset_index(name = 'values')
     fig.add_trace(
-        go.Heatmap(x = heatmap[by[0]], y = heatmap[by[1]], z = heatmap['values'], name = 'Historical radiation')
+        go.Heatmap(x = heatmap[by[0]], y = heatmap[by[1]], z = heatmap['values'], name = 'Historical radiation', colorbar_orientation='h', zmin = 0, zmax = 100, colorbar_y = -0.50)
     )
     fig.update_xaxes(categoryorder='category ascending', title = by[0].capitalize())
     fig.update_yaxes(categoryorder='category descending', title = by[1].capitalize())
-    fig.update_layout(title = f'Mean Temperature by {by[0].capitalize()} and {by[1].capitalize()}', legend_title = 'Temperature in Fahrenheit', legend_orientation = 'h', plot_bgcolor = '#000', paper_bgcolor = '#000')
+    fig.update_layout(title = f'Mean Temperature by {by[0].capitalize()} and {by[1].capitalize()}', legend_title = 'Temperature in Fahrenheit', plot_bgcolor = '#000', paper_bgcolor = '#000')
     return(fig)
 
 # For graph: 'Mean snow and frost days percent by year with trendline' 
 def snow_trend(agg_df):
     fig = go.Figure()
+    frost_fit = etl.lin_reg_fit(agg_df, 'frost_day')
+    snow_fit = etl.lin_reg_fit(agg_df, 'snow_day')
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = etl.lin_reg_fit(agg_df, 'frost_day')[0], name = 'Frost Days Trendline', line = dict(color = 'Orange'))
+        go.Scatter(x = agg_df.index, y = frost_fit[0], name = 'Frost Days Trendline', line = dict(color = 'mediumseagreen'))
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['frost_day'], name = '% Days of frost', mode = 'markers', marker = dict(color = 'Orange'))
+        go.Scatter(x = agg_df.index, y = agg_df['frost_day'], name = '% Days of frost', mode = 'markers', marker = dict(color = 'mediumseagreen'))
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = etl.lin_reg_fit(agg_df, 'snow_day')[0], name = 'Snow Days Trendline', line = dict(color = 'Blue'))
+        go.Scatter(x = agg_df.index, y = snow_fit[0], name = 'Snow Days Trendline', line = dict(color = 'aqua'))
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['snow_day'], name = '% Days of snow', mode = 'markers', marker = dict(color = 'Blue'))
+        go.Scatter(x = agg_df.index, y = agg_df['snow_day'], name = '% Days of snow', mode = 'markers', marker = dict(color = 'aqua'))
     )
-    fig.update_xaxes(title = 'Year')
-    fig.update_yaxes(title = 'Average snow and frost day chance')
+    fig.update_xaxes(title = 'Year', showgrid=False)
+    fig.update_yaxes(title = 'Average snow and frost day chance', showgrid=False, rangemode="tozero")
     fig.update_layout(title ='Average Snow and Frost Day Chance by Year', legend_title = 'Metrics', legend_orientation = 'h', plot_bgcolor = '#000', paper_bgcolor = '#000')
-    return(fig)
+    return(fig, frost_fit[1], snow_fit[1])
 
 # For graph: 'Mean temperature by year with trendline'
 def temp_trend(agg_df):
     fig = go.Figure()
+    lin_fit = etl.lin_reg_fit(agg_df, 'avg_mean_temp')
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = etl.lin_reg_fit(agg_df, 'avg_mean_temp')[0], name = 'Trendline', line = dict(color = 'Red'))
+        go.Scatter(x = agg_df.index, y = lin_fit[0], name = 'Trendline', line = dict(color = 'mediumvioletred'))
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['avg_mean_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'Red'))
+        go.Scatter(x = agg_df.index, y = agg_df['avg_max_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'Red'))
     )
-    fig.update_xaxes(title = 'Year')
-    fig.update_yaxes(title = 'Average mean temperature in Fahrenheit')
+    fig.add_trace(
+        go.Scatter(x = agg_df.index, y = agg_df['avg_mean_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'mediumvioletred'))
+    )
+    fig.add_trace(
+        go.Scatter(x = agg_df.index, y = agg_df['avg_min_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'Blue'))
+    )
+    fig.update_xaxes(title = 'Year', showgrid=False)
+    fig.update_yaxes(title = 'Average mean temperature in Fahrenheit', showgrid=False)
     fig.update_layout(title ='Average Mean Temperature by Year', legend_title = 'Metrics', legend_orientation = 'h', plot_bgcolor = '#000', paper_bgcolor = '#000')
-    return(fig)
+    return(fig, lin_fit[1])
 
-# For graph: 'Mean snow and frost day chance by month with frost date line'
-def frost_line(df):
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig.add_trace(
-        go.Violin(x = df['month'], y = df['frost_day'], name = 'Percent Frost Days'),
-        secondary_y=False
-    )
-    fig.add_trace(
-        go.Violin(x = df['month'], y = df['snowfall_sum'], name = 'Snow Fall'),
-        secondary_y=True
-    )
-    fig.update_xaxes(title = 'Month')
-    fig.update_yaxes(title = 'Average snow and frost day chance')
-    fig.update_layout(title ='Average Snow and Frost Day Chance by Month', legend_title = 'Metrics', legend_orientation = 'h', plot_bgcolor = '#000', paper_bgcolor = '#000')
+# For graph: 'Radiation by month'
+def radiation_graph(df):
+    fig = px.line(df, x = 'time', y = 'sunlight_minutes')
+    fig.update_traces(line_color='goldenrod', line_width=5)
+    fig.update_xaxes(title = 'Day of Year', showgrid=False, type = 'date', range = [pd.Timestamp(year = 2022, month = 1, day = 1), pd.Timestamp(year = 2022, month = 12, day = 31)])
+    fig.update_yaxes(title = 'Minutes of Sunlight', showgrid=False, rangemode="tozero")
+    fig.update_layout(title ='Sunlight by Day of Year', legend_title = 'Metrics', legend_orientation = 'h', plot_bgcolor = '#000', paper_bgcolor = '#000')
     return(fig)
 
 
