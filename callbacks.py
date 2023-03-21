@@ -39,12 +39,15 @@ def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
     if tabs == 1:
         temp_trend = graph.temp_trend(annual_data)
         snow_trend = graph.snow_trend(annual_data)
-        return(html.H4(f'For GPS Coordinates ({str(lat)}, {str(long)}), yearly mean temperatures have risen {str(round(temp_trend[1],3))} degrees Fahrenheit per year. Percent of the year which could be counted as snow days (snow fall > 0) decreased {str(round(-100*snow_trend[2],3))}% per year. Percent of the year that has below freezing average tremperatures went down {str(round(-100*snow_trend[1],3))}% per year.'), 
+        return(html.Div([html.P(f'For GPS Coordinates ({str(lat)}, {str(long)}):'),
+                        html.P(f' - Yearly mean temperatures have risen from {temp_trend[2]}°F in {snow_trend[7]} to {temp_trend[3]}°F in {snow_trend[8]} or {str(round(temp_trend[1],3))} degrees Fahrenheit per year.'), 
+                        html.P(f' - Percent of the year which could be counted as snow days (snow fall > 0) went from {snow_trend[5]}% in {snow_trend[7]} to {snow_trend[6]}% in {snow_trend[8]} or {str(round(100*snow_trend[2],3))}% per year.'), 
+                        html.P(f' - Percent of the year that has below freezing average tremperatures went from {snow_trend[3]}% in {snow_trend[7]} to {snow_trend[4]}% in {snow_trend[8]} or {str(round(100*snow_trend[1],3))}% per year.''')]), 
                graph.heatmap_temp(data), 
                temp_trend[0], 
                snow_trend[0])
     else:
-        return(html.H4(f'Seasonal metrics for GPS Coordinates ({str(lat)}, {str(long)}).'),
+        return(html.P(f'Seasonal metrics for GPS Coordinates all years ({str(lat)}, {str(long)}).'),
                graph.heatmap_temp(data, by = ['day','month']), 
                graph.temp_snow(data, seasonal_data), 
                graph.radiation_graph(data))
@@ -92,18 +95,12 @@ if __name__ == '__main__':
     index.app.run_server(debug=True, host='127.0.0.1')
 
 # To-do list
-# - Make theme dark (X)
-# - Change plot themes (X)
-# - Make annual temp plots show min and max temps with lines in between (x)
-# - Include radiation graph in seasonal (x)
+# - Create a DynamoDB to store API requests (x)
 # - Include precipitation graph in seasonal and annual
-# - Make apply changes button (x)
-# - Make tabs a clearer clickable entity (x)
-# - Make a spinny refresh icon (x)
-# - Make url climate.haydenquilty.com (x)
 # - Make blog point to haydenquilty.com
-# - Store dataframe as JSON for faster loading (x)
-# - Include a GPS pin map (x)
-# - Include a summary sentence at the top of the tab (x)
+# - Include a slicer for year in seasonal changes 
+# - Make summary clearer with absolute changes
+# - Make website encode location and date range data in url
+# - Add padding around apply changes (x)
     
     

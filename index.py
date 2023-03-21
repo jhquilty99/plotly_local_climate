@@ -14,8 +14,8 @@ SIDEBAR_STYLE = {
     "padding": "1rem 1rem",
     "backgroundColor": "#000000",
 }
-INLINE_STYLE = {'display': 'inline-block', 'width':'49%'}
-SELECT_STYLE = {"backgroundColor": '#3498db','color':'#FFFFFF', 'box-shadow': '0px 7px 15px #000'}
+INLINE_STYLE = {'display': 'table-cell', 'width':'49%', 'margin': '0 auto', 'textAlign':'center', 'verticalAlign':'middle'}
+SELECT_STYLE = {"backgroundColor": '#3498db','color':'#FFFFFF', 'boxShadow': '0px 7px 15px #000'}
 sidebar = html.Div([
         html.H2("Filters"),
         html.Hr(),
@@ -23,19 +23,17 @@ sidebar = html.Div([
                 dl.Map([dl.TileLayer(), dl.LayerGroup(id = 'pin-layer')], id = 'map-figure', zoom = 7, center = (38.895, -77.036), style={'height': '500px', 'width': '100%', 'margin': "auto", "display": "block"}),
                 #dbc.Row([html.H4('GPS Latitude', style=INLINE_STYLE), dcc.Input(id = 'lat', type = 'number', min = -90, max = 90, placeholder='GPS Latitude Goes Here', debounce = True, value = 38.80, style=INLINE_STYLE_PADDING)]), 
                 #dbc.Row([html.H4('GPS Longitude', style=INLINE_STYLE), dcc.Input(id = 'long', type = 'number', min = -180, max = 180, placeholder='GPS Longitude Goes Here', debounce = True, value = -77.05, style=INLINE_STYLE_PADDING)]), 
-                dbc.Row([html.H4('Start -> End', style=INLINE_STYLE), dcc.DatePickerRange(
+                dbc.Row([html.H4('Start to End of Data', style=INLINE_STYLE), dcc.DatePickerRange(
                                                         id='date-picker-range',
-                                                        min_date_allowed = date(1960, 1, 1),
+                                                        min_date_allowed = date(1959, 1, 1),
                                                         max_date_allowed = date.today(),
-                                                        start_date = date(1970, 3, 1),
+                                                        start_date = date(1970, 1, 1),
                                                         end_date = date(2023, 3, 1),
                                                         clearable=True,
                                                         style = INLINE_STYLE 
-                                                    )]), 
-                dbc.Row([dbc.Button('Apply Changes', color = 'info', id = 'apply-changes')]),
-                dcc.Loading(dcc.Store(id = 'data')),
-                dcc.Store(id = 'annual-data'),
-                dcc.Store(id = 'seasonal-data'),
+                                                    )], style={'display':'table'}), 
+                dbc.Row([dbc.Button('Apply Changes', color = 'info', id = 'apply-changes')], style={'marginBottom':'1rem'}),
+                dbc.Row([dcc.Loading(dcc.Store(id = 'data')),dcc.Store(id = 'annual-data'),dcc.Store(id = 'seasonal-data')], style={'marginBottom':'1rem'}),
         ], gap = 3)
     ], style=SIDEBAR_STYLE)
 
@@ -46,7 +44,9 @@ app.layout = html.Div([
     dcc.Store(id = 'long'),
     html.Br(),
     # Header
-    html.H1('Climate Visualizer'),
+    html.H1('CLIMATE VISUALIZER', style={'fontStyle':'bold'}),
+    html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, set the dates of interest, and hit apply changes to get started visualizing climate change.'),
+    html.H6([dcc.Link('Weather data by Open-Meteo.com. ',"https://open-meteo.com/"),'ERA5: Generated using Copernicus Climate Change Service information 2023. ', dcc.Link('Data is available under Attribution 4.0 International CC License.','https://creativecommons.org/licenses/by/4.0/')], style={'fontStyle':'italic'}),
     sidebar,
     # Tabs for each section
     dcc.Tabs(id='tabs', value='tab-1', children=[
@@ -54,14 +54,12 @@ app.layout = html.Div([
         dcc.Tab(label='Seasonal Climate Changes', value='tab-2', selected_style=SELECT_STYLE),
     ], colors = { 'border': "#000000", 'primary': '#3498db', 'background': "#222"}),
     dcc.Loading(html.Div(id='tabs-content'), type = 'circle'),
-], style = {"padding": "1rem", "backgroundColor": '#343434'})
+], style = {"padding": "1rem", "backgroundColor": '#343434', 'color':'#ebebeb'})
 
 # Annual Climate Changes Tab
 tab_1 = html.Div([
             html.Br(),
             html.H3('Changes in Climate Metrics by Year'),
-            html.Hr(),
-            html.P('Visualizes climate metrics by year: temperature, snow day percent, frost day percent.', className="lead"),
             dcc.Loading(html.Div(id = 'statement', style = {"backgroundColor": "#000000","padding": "1rem 1rem"}), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_1'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_2'), type = 'circle'),
@@ -71,9 +69,7 @@ tab_1 = html.Div([
 # Seasonal Climate Changes Tab 
 tab_2 = html.Div([
             html.Br(),
-            html.H3('Changes in Climate Metrics by Season'),
-            html.Hr(),
-            html.P('Visualizes climate metrics by month: temperature, snowfall chance, and solar radiation.', className="lead"),
+            html.H4('Changes in Climate Metrics by Season'),
             dcc.Loading(html.Div(id = 'statement', style = {"backgroundColor": "#000000","padding": "1rem 1rem"}), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_1'), type = 'circle'),
             dcc.Loading(dcc.Graph(id = 'graph_2'), type = 'circle'),

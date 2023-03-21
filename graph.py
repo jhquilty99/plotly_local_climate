@@ -105,7 +105,7 @@ def snow_trend(agg_df):
                       legend_y = -0.2,
                       plot_bgcolor = '#000', 
                       paper_bgcolor = '#000')
-    return(fig, frost_fit[1], snow_fit[1])
+    return(fig, frost_fit[1], snow_fit[1], round(frost_fit[0][0],3), round(frost_fit[0][-1],3), round(snow_fit[0][0],3), round(snow_fit[0][-1],3), str(agg_df.index[0]), str(agg_df.index[-1]))
 
 # For graph: 'Mean temperature by year with trendline'
 def temp_trend(agg_df):
@@ -140,7 +140,7 @@ def temp_trend(agg_df):
                       legend_y = -0.2,
                       plot_bgcolor = '#000', 
                       paper_bgcolor = '#000')
-    return(fig, lin_fit[1])
+    return(fig, lin_fit[1], round(lin_fit[0][0],1), round(lin_fit[0][-1],1))
 
 # For graph: 'Radiation by month'
 def radiation_graph(df):

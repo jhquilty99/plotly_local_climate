@@ -4,8 +4,30 @@ import pandas as pd
 import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import boto3
+import random
 
-def load_annual_data(lat = 38.80, long = -77.05, start = '1971-01-01', end = '2023-03-05'):
+def generateRowId():
+  ts = int(datetime.datetime.now().timestamp())
+  randid = random.randrange(0,512)
+  return str(ts)+str(randid)
+
+def load_annual_data(lat = 38.80, long = -77.05, start = '1960-01-01', end = '2023-03-05'):
+    # Log to DynamoDB
+    client = boto3.client('dynamodb', region_name='us-east-1')
+    date = datetime.datetime.now()
+    ret = client.put_item(Item = {
+                    'id': {'S': generateRowId()},
+                    'lat': {'S': str(lat)},
+                    'long': {'S': str(long)},
+                    'start': {'S': start},
+                    'stop': {'S': end},
+                    'created_at': {'S': str(date.strftime('%D %R'))},
+                    },
+                    TableName = 'climate_log',
+                    ReturnConsumedCapacity='TOTAL'
+    )
+    print(str(ret))
     # Extract data
     url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
     response = requests.get(url)
@@ -18,16 +40,16 @@ def load_annual_data(lat = 38.80, long = -77.05, start = '1971-01-01', end = '20
     df['day'] = df.apply(lambda x: datetime.date.strftime(x['time'], '%e'), axis = 1)
     df['month'] = df.apply(lambda x: datetime.date.strftime(x['time'], '%m-%b'), axis = 1)
     df['year'] = df.apply(lambda x: int(datetime.date.strftime(x['time'], '%Y')), axis = 1)
+    # Clean up data
+    df.dropna(inplace = True)
+    df = df.loc[df['year'] != int(start[0:4])]
+    df = df.loc[df['year'] != int(end[0:4])]
     # Derive new features from the data
     df['snow_day'] = df.apply(lambda x: int(x['snowfall_sum'] > 0), axis = 1)
     df['sunrise'] = df.apply(lambda x: pd.Timestamp(x['sunrise']), axis = 1)
     df['sunset'] = df.apply(lambda x: pd.Timestamp(x['sunset']), axis = 1)
     df['sunlight_minutes'] = df.apply(lambda x: pd.Timedelta(x['sunset'] - x['sunrise']).seconds / 60.0, axis = 1)
     df['frost_day'] = df.apply(lambda x: int(x['temperature_2m_min'] <= 32), axis = 1)
-    # Clean up data
-    df.dropna(inplace = True)
-    df = df.loc[df['year'] != int(start[0:4])]
-    df = df.loc[df['year'] != int(end[0:4])]
     monthly_agg_df = pd.DataFrame()
     # Derive new features for the monthly data
     monthly_agg_df['snow_day'] = df.groupby(by = 'month').apply(lambda x: x['snow_day'].mean())
