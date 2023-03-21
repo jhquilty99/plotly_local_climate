@@ -2,10 +2,12 @@ import index
 from dash.dependencies import Input, Output, State
 import graph
 import etl
-from datetime import date
+from datetime import date, datetime
 import dash_leaflet as dl
 import pandas as pd
 from dash import html
+import boto3
+from flask import request
 
 @index.app.callback(
     Output('tabs-content', 'children'),
@@ -52,7 +54,6 @@ def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
                graph.temp_snow(data, seasonal_data), 
                graph.radiation_graph(data))
 
-
 @index.app.callback(
     Output('data','data'),
     Output('seasonal-data','data'),
@@ -68,9 +69,26 @@ def update_data(lat, long, start_date, end_date, apply_changes):
     start_date = date.fromisoformat(start_date)
     end_date = date.fromisoformat(end_date)
     if lat == None:
-        data = etl.load_annual_data(38.895, -77.036, start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
-    else: 
-        data = etl.load_annual_data(round(lat,3), round(long,3), start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
+        lat = 38.895
+        long = -77.036
+    # Log to DynamoDB
+    client = boto3.client('dynamodb', region_name='us-east-1')
+    now = datetime.now()
+    ret = client.put_item(Item = {
+                    'id': {'S': etl.generateRowId()},
+                    'lat': {'S': str(lat)},
+                    'long': {'S': str(long)},
+                    'start': {'S': start_date.strftime('%Y-%m-%d')},
+                    'stop': {'S': end_date.strftime('%Y-%m-%d')},
+                    'created_at': {'S': str(now.strftime('%D %R'))},
+                    'ip': {'S': str(request.remote_addr)},
+                    'user': {'S': str(request.remote_user)}
+                    },
+                    TableName = 'climate_log',
+                    ReturnConsumedCapacity='TOTAL'
+    )
+    print(str(ret))
+    data = etl.load_annual_data(round(lat,3), round(long,3), start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
     return(data[0].to_json(), data[1].to_json(), data[2].to_json())
 
 @index.app.callback(

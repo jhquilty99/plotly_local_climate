@@ -4,7 +4,6 @@ import pandas as pd
 import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
-import boto3
 import random
 
 def generateRowId():
@@ -13,21 +12,6 @@ def generateRowId():
   return str(ts)+str(randid)
 
 def load_annual_data(lat = 38.80, long = -77.05, start = '1960-01-01', end = '2023-03-05'):
-    # Log to DynamoDB
-    client = boto3.client('dynamodb', region_name='us-east-1')
-    date = datetime.datetime.now()
-    ret = client.put_item(Item = {
-                    'id': {'S': generateRowId()},
-                    'lat': {'S': str(lat)},
-                    'long': {'S': str(long)},
-                    'start': {'S': start},
-                    'stop': {'S': end},
-                    'created_at': {'S': str(date.strftime('%D %R'))},
-                    },
-                    TableName = 'climate_log',
-                    ReturnConsumedCapacity='TOTAL'
-    )
-    print(str(ret))
     # Extract data
     url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
     response = requests.get(url)
