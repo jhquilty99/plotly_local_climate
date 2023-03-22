@@ -49,7 +49,7 @@ def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
                temp_trend[0], 
                snow_trend[0])
     else:
-        return(html.P(f'Seasonal metrics for GPS Coordinates all years ({str(lat)}, {str(long)}).'),
+        return(html.P(f'Seasonal metrics for {etl.reverse_geocoding(lat, long)}, ({str(lat)}, {str(long)}) from all historical data.'),
                graph.heatmap_temp(data, by = ['day','month']), 
                graph.temp_snow(data, seasonal_data), 
                graph.radiation_graph(data))
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 # - Include precipitation graph in seasonal and annual
 # - Make blog point to haydenquilty.com
 # - Include a slicer for year in seasonal changes 
-# - Make summary clearer with absolute changes
+# - Make summary clearer with absolute changes (x)
 # - Make website encode location and date range data in url
 # - Add padding around apply changes (x)
     

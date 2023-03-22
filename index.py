@@ -17,8 +17,9 @@ SIDEBAR_STYLE = {
 INLINE_STYLE = {'display': 'table-cell', 'width':'49%', 'margin': '0 auto', 'textAlign':'center', 'verticalAlign':'middle'}
 SELECT_STYLE = {"backgroundColor": '#3498db','color':'#FFFFFF', 'boxShadow': '0px 7px 15px #000'}
 sidebar = html.Div([
-        html.H2("Filters"),
+        html.H2('Filters'),
         html.Hr(),
+        html.H4("Pin a Location Anywhere in the World to See its Historical Climate Data"),
         dbc.Stack([
                 dl.Map([dl.TileLayer(), dl.LayerGroup(id = 'pin-layer')], id = 'map-figure', zoom = 7, center = (38.895, -77.036), style={'height': '500px', 'width': '100%', 'margin': "auto", "display": "block"}),
                 #dbc.Row([html.H4('GPS Latitude', style=INLINE_STYLE), dcc.Input(id = 'lat', type = 'number', min = -90, max = 90, placeholder='GPS Latitude Goes Here', debounce = True, value = 38.80, style=INLINE_STYLE_PADDING)]), 
@@ -45,7 +46,7 @@ app.layout = html.Div([
     html.Br(),
     # Header
     html.H1('CLIMATE VISUALIZER', style={'fontStyle':'bold'}),
-    html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, set the dates of interest, and hit apply changes to get started visualizing climate change.'),
+    html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, set the dates of interest, and hit apply changes to get started visualizing climate change in the graphs below.'),
     sidebar,
     # Tabs for each section
     dcc.Tabs(id='tabs', value='tab-1', children=[
