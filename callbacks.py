@@ -41,7 +41,7 @@ def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
     if tabs == 1:
         temp_trend = graph.temp_trend(annual_data)
         snow_trend = graph.snow_trend(annual_data)
-        return(html.Div([html.P(f'For GPS Coordinates ({str(lat)}, {str(long)}):'),
+        return(html.Div([html.P(f'For {etl.reverse_geocoding(lat, long)}, ({str(lat)}, {str(long)}):'),
                         html.P(f' - Yearly mean temperatures have risen from {temp_trend[2]}°F in {snow_trend[7]} to {temp_trend[3]}°F in {snow_trend[8]} or {str(round(temp_trend[1],3))} degrees Fahrenheit per year.'), 
                         html.P(f' - Percent of the year which could be counted as snow days (snow fall > 0) went from {snow_trend[5]}% in {snow_trend[7]} to {snow_trend[6]}% in {snow_trend[8]} or {str(round(100*snow_trend[2],3))}% per year.'), 
                         html.P(f' - Percent of the year that has below freezing average tremperatures went from {snow_trend[3]}% in {snow_trend[7]} to {snow_trend[4]}% in {snow_trend[8]} or {str(round(100*snow_trend[1],3))}% per year.''')]), 
@@ -99,12 +99,12 @@ def update_data(lat, long, start_date, end_date, apply_changes):
 )
 def map_update(click_lat_lng):
     if click_lat_lng == None:
-        return([dl.Marker(position=(38.895, -77.036), children=dl.Tooltip("(38.895, -77.036)"))],
+        return([dl.Marker(position = (38.895, -77.036), children = dl.Tooltip("(38.895, -77.036)"))],
                 38.895,
                 -77.036
                 )
     else:    
-        return([dl.Marker(position=click_lat_lng, children=dl.Tooltip("({:.3f}, {:.3f})".format(*click_lat_lng)))],
+        return([dl.Marker(position = click_lat_lng, children = dl.Tooltip("({:.3f}, {:.3f})".format(*click_lat_lng)))],
                 round(click_lat_lng[0], 3),
                 round(click_lat_lng[1], 3)
                 )

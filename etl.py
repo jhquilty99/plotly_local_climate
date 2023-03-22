@@ -11,6 +11,12 @@ def generateRowId():
   randid = random.randrange(0,512)
   return str(ts)+str(randid)
 
+def reverse_geocoding(lat = 38.80, long = -77.05):
+    url = f"https://api.geoapify.com/v1/geocode/reverse?lat={str(lat)}&lon={str(long)}&apiKey=7dbb819bf8ba4ac2915b6978c23c48f4"
+    resp = requests.get(url)
+    df = pd.DataFrame.from_records(resp.json()['features'][0]['properties'])
+    return(str(df.iloc[0]['formatted']))
+
 def load_annual_data(lat = 38.80, long = -77.05, start = '1960-01-01', end = '2023-03-05'):
     # Extract data
     url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'

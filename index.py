@@ -46,7 +46,6 @@ app.layout = html.Div([
     # Header
     html.H1('CLIMATE VISUALIZER', style={'fontStyle':'bold'}),
     html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, set the dates of interest, and hit apply changes to get started visualizing climate change.'),
-    html.H6([dcc.Link('Weather data by Open-Meteo.com. ',"https://open-meteo.com/"),'ERA5: Generated using Copernicus Climate Change Service information 2023. ', dcc.Link('Data is available under Attribution 4.0 International CC License.','https://creativecommons.org/licenses/by/4.0/')], style={'fontStyle':'italic'}),
     sidebar,
     # Tabs for each section
     dcc.Tabs(id='tabs', value='tab-1', children=[
@@ -54,6 +53,17 @@ app.layout = html.Div([
         dcc.Tab(label='Seasonal Climate Changes', value='tab-2', selected_style=SELECT_STYLE),
     ], colors = { 'border': "#000000", 'primary': '#3498db', 'background': "#222"}),
     dcc.Loading(html.Div(id='tabs-content'), type = 'circle'),
+    html.H6([dcc.Link('Weather data by Open-Meteo.com.',"https://open-meteo.com/"),
+             'ERA5: Generated using Copernicus Climate Change Service information 2023. ', 
+             dcc.Link('Data is available under Attribution 4.0 International CC License.','https://creativecommons.org/licenses/by/4.0/')
+    ], style={'fontStyle':'italic'}),
+    html.H6([dcc.Link('Map data by OpenStreetMap®.','https://wiki.osmfoundation.org/wiki/Main_Page'),
+             'Licensed under the ',
+             dcc.Link('Open Data Commons Open Database License (ODbL).','https://opendatacommons.org/licenses/odbl/'),
+    ], style={'fontStyle':'italic'}),
+    html.H6(['Reverse geocoding provided by ', 
+             dcc.Link('by Geoapify.','https://www.geoapify.com/term-and-conditions'),
+    ], style={'fontStyle':'italic'}),
 ], style = {"padding": "1rem", "backgroundColor": '#343434', 'color':'#ebebeb'})
 
 # Annual Climate Changes Tab

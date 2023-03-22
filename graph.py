@@ -55,7 +55,7 @@ def heatmap_temp(df, by = ['year','month']):
     heatmap = df.groupby(by = by).apply(lambda x: x['temperature_2m_mean'].mean())
     heatmap = heatmap.reset_index(name = 'values')
     fig.add_trace(
-        go.Heatmap(x = heatmap[by[0]], y = heatmap[by[1]], z = heatmap['values'], name = 'Historical radiation', colorbar_orientation='h', zmin = 0, zmax = 100, colorbar_y = -0.50)
+        go.Heatmap(x = heatmap[by[0]], y = heatmap[by[1]], z = heatmap['values'], name = 'Historical radiation', colorbar_orientation='h', zmin = 0, zmax = 100, colorbar_y = -0.75, colorbar_title = 'Temperature in Fahrenheit', colorbar_title_side = 'bottom')
     )
     fig.update_xaxes(categoryorder='category ascending', 
                      title = by[0].capitalize(),
@@ -115,13 +115,13 @@ def temp_trend(agg_df):
         go.Scatter(x = agg_df.index, y = lin_fit[0], name = 'Trendline', line = dict(color = 'mediumvioletred'))
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['avg_max_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'Red'))
+        go.Scatter(x = agg_df.index, y = agg_df['avg_max_temp'], name = 'Max Historical Temperature', mode = 'markers', marker = dict(color = 'Red'))
     )
     fig.add_trace(
         go.Scatter(x = agg_df.index, y = agg_df['avg_mean_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'mediumvioletred'))
     )
     fig.add_trace(
-        go.Scatter(x = agg_df.index, y = agg_df['avg_min_temp'], name = 'Average Historical Temperature', mode = 'markers', marker = dict(color = 'Blue'))
+        go.Scatter(x = agg_df.index, y = agg_df['avg_min_temp'], name = 'Min Historical Temperature', mode = 'markers', marker = dict(color = 'Blue'))
     )
     fig.update_xaxes(title = 'Year', 
                      showgrid=False,
