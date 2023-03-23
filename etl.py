@@ -17,9 +17,21 @@ def reverse_geocoding(lat = 38.80, long = -77.05):
     df = pd.DataFrame.from_records(resp.json()['features'][0]['properties'])
     return(str(df.iloc[0]['formatted']))
 
+def load_solar_data(lat = 38.80, long = -77.05):
+    url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date=2020-01-02&end_date=2021-01-01&daily=sunrise,sunset&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
+    response = requests.get(url)
+    # Load data
+    response = json.loads(response.text)
+    df = pd.DataFrame.from_records(response['daily'])
+    df['time'] = df.apply(lambda x: pd.Timestamp(x['time']), axis = 1)
+    df['sunrise'] = df.apply(lambda x: pd.Timestamp(x['sunrise']), axis = 1)
+    df['sunset'] = df.apply(lambda x: pd.Timestamp(x['sunset']), axis = 1)
+    df['sunlight_minutes'] = df.apply(lambda x: pd.Timedelta(x['sunset'] - x['sunrise']).seconds / 60.0, axis = 1)
+    return(df)
+
 def load_annual_data(lat = 38.80, long = -77.05, start = '1960-01-01', end = '2023-03-05'):
     # Extract data
-    url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
+    url = f'https://archive-api.open-meteo.com/v1/archive?latitude={str(lat)}&longitude={str(long)}&start_date={start}&end_date={end}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,shortwave_radiation_sum,precipitation_sum,snowfall_sum&timezone=America%2FNew_York&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch'
     response = requests.get(url)
     # Load data
     response = json.loads(response.text)
@@ -36,9 +48,6 @@ def load_annual_data(lat = 38.80, long = -77.05, start = '1960-01-01', end = '20
     df = df.loc[df['year'] != int(end[0:4])]
     # Derive new features from the data
     df['snow_day'] = df.apply(lambda x: int(x['snowfall_sum'] > 0), axis = 1)
-    df['sunrise'] = df.apply(lambda x: pd.Timestamp(x['sunrise']), axis = 1)
-    df['sunset'] = df.apply(lambda x: pd.Timestamp(x['sunset']), axis = 1)
-    df['sunlight_minutes'] = df.apply(lambda x: pd.Timedelta(x['sunset'] - x['sunrise']).seconds / 60.0, axis = 1)
     df['frost_day'] = df.apply(lambda x: int(x['temperature_2m_min'] <= 32), axis = 1)
     monthly_agg_df = pd.DataFrame()
     # Derive new features for the monthly data

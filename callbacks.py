@@ -30,14 +30,16 @@ def render_content(tab):
     Input('data','data'),
     Input('seasonal-data','data'),
     Input('annual-data','data'),
+    Input('solar-data','data'),
     State('lat','data'),
     State('long','data'),
     prevent_initial_call=True
 ) 
-def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
+def update_graphs(tabs, data, seasonal_data, annual_data, solar_data, lat, long):
     data = pd.read_json(data)
     seasonal_data = pd.read_json(seasonal_data)
     annual_data = pd.read_json(annual_data)
+    solar_data = pd.read_json(solar_data)
     if tabs == 1:
         temp_trend = graph.temp_trend(annual_data)
         snow_trend = graph.snow_trend(annual_data)
@@ -49,25 +51,22 @@ def update_graphs(tabs, data, seasonal_data, annual_data, lat, long):
                temp_trend[0], 
                snow_trend[0])
     else:
-        return(html.P(f'Seasonal metrics for {etl.reverse_geocoding(lat, long)}, ({str(lat)}, {str(long)}) from all historical data.'),
+        return(html.P(f'Seasonal metrics for {etl.reverse_geocoding(lat, long)}, ({str(lat)}, {str(long)}).'),
                graph.heatmap_temp(data, by = ['day','month']), 
                graph.temp_snow(data, seasonal_data), 
-               graph.radiation_graph(data))
+               graph.radiation_graph(solar_data))
 
 @index.app.callback(
     Output('data','data'),
     Output('seasonal-data','data'),
     Output('annual-data','data'),
+    Output('solar-data','data'),
     State('lat','data'),
     State('long','data'),
-    State('date-picker-range', 'start_date'),
-    State('date-picker-range', 'end_date'), 
     Input('apply-changes','n_clicks'),
     #prevent_initial_call=True
 )
-def update_data(lat, long, start_date, end_date, apply_changes):
-    start_date = date.fromisoformat(start_date)
-    end_date = date.fromisoformat(end_date)
+def update_data(lat, long, apply_changes):
     if lat == None:
         lat = 38.895
         long = -77.036
@@ -78,8 +77,6 @@ def update_data(lat, long, start_date, end_date, apply_changes):
                     'id': {'S': etl.generateRowId()},
                     'lat': {'S': str(lat)},
                     'long': {'S': str(long)},
-                    'start': {'S': start_date.strftime('%Y-%m-%d')},
-                    'stop': {'S': end_date.strftime('%Y-%m-%d')},
                     'created_at': {'S': str(now.strftime('%D %R'))},
                     'ip': {'S': str(request.remote_addr)},
                     'user': {'S': str(request.remote_user)}
@@ -88,8 +85,8 @@ def update_data(lat, long, start_date, end_date, apply_changes):
                     ReturnConsumedCapacity='TOTAL'
     )
     print(str(ret))
-    data = etl.load_annual_data(round(lat,3), round(long,3), start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
-    return(data[0].to_json(), data[1].to_json(), data[2].to_json())
+    data = etl.load_annual_data(round(lat,3), round(long,3))
+    return(data[0].to_json(), data[1].to_json(), data[2].to_json(), etl.load_solar_data(str(lat), str(long)).to_json())
 
 @index.app.callback(
     Output('pin-layer', 'children'), 
@@ -113,12 +110,10 @@ if __name__ == '__main__':
     index.app.run_server(debug=True, host='127.0.0.1')
 
 # To-do list
-# - Create a DynamoDB to store API requests (x)
 # - Include precipitation graph in seasonal and annual
 # - Make blog point to haydenquilty.com
 # - Include a slicer for year in seasonal changes 
-# - Make summary clearer with absolute changes (x)
 # - Make website encode location and date range data in url
-# - Add padding around apply changes (x)
+# - Embed GitHub link in top right
     
     

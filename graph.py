@@ -150,7 +150,6 @@ def radiation_graph(df):
     fig.update_xaxes(title = 'Day of Year', 
                      showgrid=False, 
                      type = 'date', 
-                     range = [pd.Timestamp(year = 2022, month = 1, day = 1), pd.Timestamp(year = 2022, month = 12, day = 31)],
                      showline=True, 
                      linewidth=2, 
                      linecolor='white')

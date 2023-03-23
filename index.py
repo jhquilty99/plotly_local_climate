@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from datetime import date
 from app import app
 import dash_leaflet as dl
+from dash_iconify import DashIconify
 
 # Sidebar for tabs
 SIDEBAR_STYLE = {
@@ -14,7 +15,6 @@ SIDEBAR_STYLE = {
     "padding": "1rem 1rem",
     "backgroundColor": "#000000",
 }
-INLINE_STYLE = {'display': 'table-cell', 'width':'49%', 'margin': '0 auto', 'textAlign':'center', 'verticalAlign':'middle'}
 SELECT_STYLE = {"backgroundColor": '#3498db','color':'#FFFFFF', 'boxShadow': '0px 7px 15px #000'}
 sidebar = html.Div([
         html.H2('Filters'),
@@ -24,17 +24,8 @@ sidebar = html.Div([
                 dl.Map([dl.TileLayer(), dl.LayerGroup(id = 'pin-layer')], id = 'map-figure', zoom = 7, center = (38.895, -77.036), style={'height': '500px', 'width': '100%', 'margin': "auto", "display": "block"}),
                 #dbc.Row([html.H4('GPS Latitude', style=INLINE_STYLE), dcc.Input(id = 'lat', type = 'number', min = -90, max = 90, placeholder='GPS Latitude Goes Here', debounce = True, value = 38.80, style=INLINE_STYLE_PADDING)]), 
                 #dbc.Row([html.H4('GPS Longitude', style=INLINE_STYLE), dcc.Input(id = 'long', type = 'number', min = -180, max = 180, placeholder='GPS Longitude Goes Here', debounce = True, value = -77.05, style=INLINE_STYLE_PADDING)]), 
-                dbc.Row([html.H4('Start to End of Data', style=INLINE_STYLE), dcc.DatePickerRange(
-                                                        id='date-picker-range',
-                                                        min_date_allowed = date(1959, 1, 1),
-                                                        max_date_allowed = date.today(),
-                                                        start_date = date(1970, 1, 1),
-                                                        end_date = date(2023, 3, 1),
-                                                        clearable=True,
-                                                        style = INLINE_STYLE 
-                                                    )], style={'display':'table'}), 
                 dbc.Row([dbc.Button('Apply Changes', color = 'info', id = 'apply-changes')], style={'marginBottom':'1rem'}),
-                dbc.Row([dcc.Loading(dcc.Store(id = 'data')),dcc.Store(id = 'annual-data'),dcc.Store(id = 'seasonal-data')], style={'marginBottom':'1rem'}),
+                dbc.Row([dcc.Loading(dcc.Store(id = 'data')),dcc.Store(id = 'annual-data'),dcc.Store(id = 'seasonal-data'),dcc.Store(id = 'solar-data')], style={'marginBottom':'1rem'}),
         ], gap = 3)
     ], style=SIDEBAR_STYLE)
 
@@ -45,8 +36,11 @@ app.layout = html.Div([
     dcc.Store(id = 'long'),
     html.Br(),
     # Header
-    html.H1('CLIMATE VISUALIZER', style={'fontStyle':'bold'}),
-    html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, set the dates of interest, and hit apply changes to get started visualizing climate change in the graphs below.'),
+    html.H1('CLIMATE VISUALIZER', style = {'display':'inline','width':'49%','fontStyle':'bold'}),
+    html.A([
+        DashIconify(icon="ion:logo-github", width=50s, color='#ebebeb')
+    ], href='https://github.com/jhquilty99/plotly_local_climate', style = {'float':'right'}),
+    html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, and hit apply changes to get started visualizing climate change in the graphs below.'),
     sidebar,
     # Tabs for each section
     dcc.Tabs(id='tabs', value='tab-1', children=[
