@@ -38,7 +38,7 @@ app.layout = html.Div([
     # Header
     html.H1('CLIMATE VISUALIZER', style = {'display':'inline','width':'49%','fontStyle':'bold'}),
     html.A([
-        DashIconify(icon="ion:logo-github", width=50s, color='#ebebeb')
+        DashIconify(icon="ion:logo-github", width=50, color='#ebebeb')
     ], href='https://github.com/jhquilty99/plotly_local_climate', style = {'float':'right'}),
     html.H6('The purpose of this website is to make it easy to identify annual and seasonal changes in climate conditions anywhere in the world. Climate change impacts us all, but it seems like a far away problem sometimes. Find your area of interest on the map, and hit apply changes to get started visualizing climate change in the graphs below.'),
     sidebar,
