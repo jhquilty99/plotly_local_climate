@@ -1,10 +1,15 @@
-from dash import dcc, html
+from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
 #from dash_bootstrap_templates import load_figure_template
 from datetime import date
-from app import app
 import dash_leaflet as dl
 from dash_iconify import DashIconify
+import dash_bootstrap_components as dbc
+from flask import Flask
+
+#Instantiates the Dash app and identify the server
+server = Flask(__name__)
+app = Dash(__name__, server = server, title='Climate Visualizer', external_stylesheets=[dbc.themes.DARKLY, dbc.icons.BOOTSTRAP], suppress_callback_exceptions=True)
 
 # Sidebar for tabs
 SIDEBAR_STYLE = {

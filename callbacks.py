@@ -1,3 +1,4 @@
+from index import app, server
 import index
 from dash.dependencies import Input, Output, State
 import graph
@@ -9,7 +10,7 @@ from dash import html
 import boto3
 from flask import request
 
-@index.app.callback(
+@app.callback(
     Output('tabs-content', 'children'),
     Output('tabs-value','data'),
     Input('tabs', 'value'),
@@ -21,7 +22,7 @@ def render_content(tab):
     elif tab == 'tab-2':
         return (index.tab_2, 2)
     
-@index.app.callback(
+@app.callback(
     Output('statement','children'),
     Output('graph_1', 'figure'),
     Output('graph_2', 'figure'),
@@ -56,7 +57,7 @@ def update_graphs(tabs, data, seasonal_data, annual_data, solar_data, lat, long)
                graph.temp_snow(data, seasonal_data), 
                graph.radiation_graph(solar_data))
 
-@index.app.callback(
+@app.callback(
     Output('data','data'),
     Output('seasonal-data','data'),
     Output('annual-data','data'),
@@ -88,7 +89,7 @@ def update_data(lat, long, apply_changes):
     data = etl.load_annual_data(round(lat,3), round(long,3))
     return(data[0].to_json(), data[1].to_json(), data[2].to_json(), etl.load_solar_data(str(lat), str(long)).to_json())
 
-@index.app.callback(
+@app.callback(
     Output('pin-layer', 'children'), 
     Output('lat','data'),
     Output('long','data'),
@@ -107,7 +108,7 @@ def map_update(click_lat_lng):
                 )
     
 if __name__ == '__main__':
-    index.app.run_server(debug=True, host='127.0.0.1')
+    app.run(debug=True, host='127.0.0.1')
 
 # To-do list
 # - Include precipitation graph in seasonal and annual
