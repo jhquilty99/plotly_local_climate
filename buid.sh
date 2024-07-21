@@ -3,4 +3,4 @@ docker rmi -f $(docker images -aq)
 
 docker build -f Dockerfile.app -t climate .
 
-docker run -d -p 80:5000 climate
+docker run -d -p 5000:5000 climate
