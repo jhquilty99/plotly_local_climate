@@ -5,6 +5,7 @@ import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
 import random
+import os
 
 def generateRowId():
   ts = int(datetime.datetime.now().timestamp())
@@ -12,7 +13,8 @@ def generateRowId():
   return str(ts)+str(randid)
 
 def reverse_geocoding(lat = 38.80, long = -77.05):
-    url = f"https://api.geoapify.com/v1/geocode/reverse?lat={str(lat)}&lon={str(long)}&apiKey=7dbb819bf8ba4ac2915b6978c23c48f4"
+    open_meteo_api_key = os.environ['OPEN_METEO_API_KEY']
+    url = f"https://api.geoapify.com/v1/geocode/reverse?lat={str(lat)}&lon={str(long)}&apiKey={str(open_meteo_api_key)}"
     resp = requests.get(url)
     df = pd.DataFrame.from_records(resp.json()['features'][0]['properties'])
     return(str(df.iloc[0]['formatted']))
